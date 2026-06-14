@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
@@ -28,9 +28,9 @@ function BookingHistory() {
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
-  const user = getUserFromToken();
+  const user = useMemo(() => getUserFromToken(), []);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!user) {
       navigate("/customer-login");
       return;
@@ -57,11 +57,11 @@ function BookingHistory() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, navigate]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleCancelBooking = async (id) => {
     if (window.confirm("Apakah Anda yakin ingin membatalkan reservasi ini?")) {

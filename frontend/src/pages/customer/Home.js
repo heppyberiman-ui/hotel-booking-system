@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
 
@@ -40,37 +40,7 @@ function Home() {
     }
   ];
 
-  const featuredFacilities = [
-    {
-      name: "Infinity Pool",
-      location: "Rooftop (Lantai 15)",
-      hours: "06:00 - 21:00",
-      description: "Kolam renang tanpa batas di puncak hotel dengan pemandangan laut 180 derajat yang memukau.",
-      emoji: "🏊‍♂️",
-      gradient: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
-      url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1200&auto=format&fit=crop"
-    },
-    {
-      name: "Horizon Spa & Gym",
-      location: "Lantai 2",
-      hours: "08:00 - 22:00",
-      description: "Pusat relaksasi tubuh dan kebugaran dengan peralatan modern serta terapis profesional.",
-      emoji: "💆‍♀️",
-      gradient: "linear-gradient(135deg, #0d9488 0%, #0f766e 100%)",
-      url: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=1200&auto=format&fit=crop"
-    },
-    {
-      name: "Aurora Sky Lounge",
-      location: "Lantai 16",
-      hours: "16:00 - 02:00",
-      description: "Nikmati malam berbintang dengan iringan live music dan koktail signature buatan bartender ahli kami.",
-      emoji: "🍸",
-      gradient: "linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)",
-      url: "https://images.unsplash.com/photo-1560624052-449f5ddf0c31?q=80&w=1200&auto=format&fit=crop"
-    }
-  ];
-
-  const fetchRooms = async () => {
+  const fetchRooms = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await api.get("/rooms");
@@ -83,11 +53,11 @@ function Home() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchRooms();
-  }, []);
+  }, [fetchRooms]);
 
   const formatRupiah = (num) => {
     return new Intl.NumberFormat("id-ID", {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
@@ -23,7 +23,7 @@ const getUserFromToken = () => {
 
 function CustomerProfile() {
   const navigate = useNavigate();
-  const user = getUserFromToken();
+  const user = useMemo(() => getUserFromToken(), []);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -33,7 +33,7 @@ function CustomerProfile() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fetchProfileData = async () => {
+  const fetchProfileData = useCallback(async () => {
     if (!user) {
       navigate("/customer-login");
       return;
@@ -53,11 +53,11 @@ function CustomerProfile() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, navigate]);
 
   useEffect(() => {
     fetchProfileData();
-  }, []);
+  }, [fetchProfileData]);
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();

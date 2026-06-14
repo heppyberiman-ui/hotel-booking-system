@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../../services/api";
 
@@ -28,7 +28,6 @@ function RoomDetail() {
   const user = getUserFromToken();
 
   const [room, setRoom] = useState(null);
-  const [roomType, setRoomType] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activePhoto, setActivePhoto] = useState("");
@@ -74,7 +73,7 @@ function RoomDetail() {
     }
   };
 
-  const fetchRoomData = async () => {
+  const fetchRoomData = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -82,7 +81,6 @@ function RoomDetail() {
       // Fetch specific room by ID with all details
       const roomRes = await api.get(`/rooms/${id}`);
       setRoom(roomRes.data);
-      setRoomType(roomRes.data);
       setActivePhoto(roomRes.data.image_url || roomRes.data.image || "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=1200&auto=format&fit=crop");
     } catch (err) {
       console.error("Gagal memuat detail kamar:", err);
@@ -90,11 +88,11 @@ function RoomDetail() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchRoomData();
-  }, [id]);
+  }, [fetchRoomData]);
 
   // Calculate total price automatically
   useEffect(() => {
