@@ -985,9 +985,9 @@ function Bookings() {
                 {selectedBooking.payment_proof ? (
                   <div style={{ marginTop: "12px" }}>
                     <span style={{ display: "block", fontSize: "11px", fontWeight: "600", color: "#64748b", marginBottom: "6px", textTransform: "uppercase" }}>Bukti Pembayaran:</span>
-                    <a href={`http://localhost:5000${selectedBooking.payment_proof}`} target="_blank" rel="noreferrer">
+                    <a href={`https://hotel-booking-system-production-417e.up.railway.app${selectedBooking.payment_proof}`} target="_blank" rel="noreferrer">
                       <img
-                        src={`http://localhost:5000${selectedBooking.payment_proof}`}
+                        src={`https://hotel-booking-system-production-417e.up.railway.app${selectedBooking.payment_proof}`}
                         alt="Bukti Pembayaran"
                         style={{ maxWidth: "100%", maxHeight: "140px", objectFit: "contain", borderRadius: "8px", border: "1px solid #cbd5e1", cursor: "zoom-in" }}
                       />

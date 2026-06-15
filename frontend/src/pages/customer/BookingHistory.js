@@ -351,10 +351,10 @@ function BookingHistory() {
                           {booking.payment_proof ? (
                             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                               <img
-                                src={`http://localhost:5000${booking.payment_proof}`}
+                                src={`https://hotel-booking-system-production-417e.up.railway.app${booking.payment_proof}`}
                                 alt="Bukti Pembayaran"
                                 style={{ width: "40px", height: "40px", objectFit: "cover", borderRadius: "6px", border: "1px solid #d6d3d1", cursor: "pointer" }}
-                                onClick={() => window.open(`http://localhost:5000${booking.payment_proof}`, "_blank")}
+                                onClick={() => window.open(`https://hotel-booking-system-production-417e.up.railway.app${booking.payment_proof}`, "_blank")}
                               />
                               <span style={{ fontSize: "12px", color: "#16a34a", fontWeight: "600" }}>✓ Bukti Terunggah (Menunggu Verifikasi)</span>
                             </div>

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: "http://localhost:5000/api",
+    baseURL: "https://hotel-booking-system-production-417e.up.railway.app/api",
 });
 
 // Automatically inject JWT token into authorization header
