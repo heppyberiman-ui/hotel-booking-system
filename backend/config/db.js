@@ -1,10 +1,12 @@
+require("dotenv").config();
 const mysql = require("mysql2");
 
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "grand_horizon_hotel"
+    host: process.env.MYSQLHOST || "localhost",
+    user: process.env.MYSQLUSER || "root",
+    password: process.env.MYSQLPASSWORD || "",
+    database: process.env.MYSQLDATABASE || "grand_horizon_hotel",
+    port: process.env.MYSQLPORT ? parseInt(process.env.MYSQLPORT, 10) : 3306
 });
 
 db.connect((err) => {

@@ -1,4 +1,6 @@
+require("dotenv").config();
 const db = require("./config/db");
+const dbName = process.env.MYSQLDATABASE || "grand_horizon_hotel";
 
 const columnsToAdd = [
   { name: "description", type: "TEXT NULL" },
@@ -22,8 +24,8 @@ const roomTypeColumns = [
 const checkAndAddColumn = (tableName, col) => {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'grand_horizon_hotel' AND TABLE_NAME = ? AND COLUMN_NAME = ?",
-      [tableName, col.name],
+      "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = ?",
+      [dbName, tableName, col.name],
       (err, results) => {
         if (err) return reject(err);
         if (results.length > 0) {
@@ -251,12 +253,13 @@ const alterBookingsTable = () => {
 
         // Check if booking_code column exists first
         db.query(
-          "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'grand_horizon_hotel' AND TABLE_NAME = 'bookings' AND COLUMN_NAME = 'booking_code'",
-          [1], // placeholder or empty since the table schema and table name check uses parameters
+          "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'bookings' AND COLUMN_NAME = 'booking_code'",
+          [dbName], // using dbName placeholder
           (err, results) => {
             // Note: information_schema check in checkAndAddColumn uses tableName and col.name as params. Let's write it explicitly.
             db.query(
-              "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'grand_horizon_hotel' AND TABLE_NAME = 'bookings' AND COLUMN_NAME = 'booking_code'",
+              "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'bookings' AND COLUMN_NAME = 'booking_code'",
+              [dbName],
               (err, results) => {
                 if (err) return reject(err);
                 if (results.length > 0) {
@@ -288,7 +291,8 @@ const alterUsersTable = () => {
       
       // Check if avatar_url column exists first
       db.query(
-        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'grand_horizon_hotel' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'avatar_url'",
+        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'users' AND COLUMN_NAME = 'avatar_url'",
+        [dbName],
         (err, results) => {
           if (err) return reject(err);
           if (results.length > 0) {
