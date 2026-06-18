@@ -3,12 +3,6 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../../services/api";
 import "./RoomDetail.css";
 import {
-  Tv,
-  Wind,
-  BedDouble,
-  Bath,
-  Wifi,
-  Coffee,
   Waves,
   Utensils,
   Dumbbell,
@@ -223,12 +217,41 @@ function RoomDetail() {
 
   // Facilities lists
   const roomFacilities = [
-    { name: "Smart TV", icon: Tv, desc: "Ultra HD & Streaming" },
-    { name: "AC", icon: Wind, desc: "Pendingin Ruangan Prima" },
-    { name: room.bed_type || "Queen Bed", icon: BedDouble, desc: "Kasur Berkualitas Tinggi" },
-    { name: "Kamar Mandi Dalam", icon: Bath, desc: "Air Hangat & Toiletries" },
-    { name: "WiFi Gratis", icon: Wifi, desc: "Kecepatan Kencang" },
-    { name: "Sarapan Gratis", icon: Coffee, desc: "Prasmanan Kuliner" }
+    {
+      name: "Room Photo",
+      imageUrl: roomImage,
+      desc: "Tampilan interior kamar elegan berdesain modern dengan kenyamanan premium."
+    },
+    { 
+      name: "Smart TV", 
+      imageUrl: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?q=80&w=400&auto=format&fit=crop", 
+      desc: "Layar Ultra HD 4K dengan streaming Netflix & YouTube." 
+    },
+    { 
+      name: "Air Conditioner", 
+      imageUrl: "https://images.unsplash.com/photo-1621905252507-b354bc25edac?q=80&w=400&auto=format&fit=crop", 
+      desc: "Kontrol suhu AC individual otomatis untuk kenyamanan optimal." 
+    },
+    { 
+      name: room.bed_type || "Queen Bed", 
+      imageUrl: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=400&auto=format&fit=crop", 
+      desc: "Kasur premium ortopedi berlapis linen katun Mesir murni." 
+    },
+    { 
+      name: "Private Bathroom", 
+      imageUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=400&auto=format&fit=crop", 
+      desc: "Kamar mandi marmer dengan shower air hangat & bathtub mewah." 
+    },
+    { 
+      name: "Free WiFi", 
+      imageUrl: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=400&auto=format&fit=crop", 
+      desc: "Akses internet nirkabel berkecepatan tinggi gratis tanpa batas." 
+    },
+    { 
+      name: "Breakfast Buffet", 
+      imageUrl: "https://images.unsplash.com/photo-1495214783159-3503fd1b572d?q=80&w=400&auto=format&fit=crop", 
+      desc: "Sarapan prasmanan lokal & kontinental segar disiapkan setiap hari." 
+    }
   ];
 
   const hotelPremiumFacilities = [
@@ -323,20 +346,25 @@ function RoomDetail() {
             <div className="detail-section">
               <h3 className="section-title">Fasilitas Kamar</h3>
               <div className="facility-grid">
-                {roomFacilities.map((fac, idx) => {
-                  const IconComponent = fac.icon;
-                  return (
-                    <div key={idx} className="facility-card">
-                      <div className="facility-icon-wrapper">
-                        <IconComponent size={20} />
-                      </div>
-                      <div>
-                        <div className="facility-name">{fac.name}</div>
-                        <p className="facility-desc">{fac.desc}</p>
-                      </div>
+                {roomFacilities.map((fac, idx) => (
+                  <div key={idx} className="facility-card">
+                    <div className="facility-card-img-wrapper">
+                      <img 
+                        src={fac.imageUrl} 
+                        alt={fac.name} 
+                        className="facility-card-img"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=400&auto=format&fit=crop";
+                        }}
+                      />
                     </div>
-                  );
-                })}
+                    <div className="facility-card-content">
+                      <h4 className="facility-name">{fac.name}</h4>
+                      <p className="facility-desc">{fac.desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
