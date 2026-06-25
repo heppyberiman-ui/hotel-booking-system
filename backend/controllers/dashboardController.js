@@ -2,6 +2,8 @@ const db = require("../config/db");
 
 // GET dashboard statistics
 const getDashboardStats = (req, res) => {
+    console.log("[Dashboard Controller] getDashboardStats called");
+
     // 1. Core counters + revenue stats + available/occupied room counts
     const mainStatsQuery = `
         SELECT 
@@ -15,8 +17,10 @@ const getDashboardStats = (req, res) => {
             (SELECT COUNT(*) FROM rooms WHERE stock_kamar = 0) AS occupied_rooms
     `;
 
+    console.log("[Dashboard Controller] Executing query 1: Main statistics...");
     db.query(mainStatsQuery, (err, mainResults) => {
         if (err) {
+            console.error(`[Dashboard Controller] mainStatsQuery error: ${err.message}`, err);
             return res.status(500).json({
                 message: "Gagal mengambil data dashboard",
                 error: err.message
@@ -24,6 +28,7 @@ const getDashboardStats = (req, res) => {
         }
 
         const stats = mainResults[0] || {};
+        console.log(`[Dashboard Controller] Main stats retrieved successfully: ${JSON.stringify(stats)}`);
 
         // 2. Recent Bookings (top 5)
         const recentBookingsQuery = `
@@ -35,13 +40,17 @@ const getDashboardStats = (req, res) => {
             LIMIT 5
         `;
 
+        console.log("[Dashboard Controller] Executing query 2: Recent bookings...");
         db.query(recentBookingsQuery, (err, recentResults) => {
             if (err) {
+                console.error(`[Dashboard Controller] recentBookingsQuery error: ${err.message}`, err);
                 return res.status(500).json({
                     message: "Gagal mengambil data booking terbaru",
                     error: err.message
                 });
             }
+
+            console.log(`[Dashboard Controller] Recent bookings retrieved successfully, count: ${recentResults.length}`);
 
             // 3. Monthly statistics grouped by check_in month of the current year
             const monthlyStatsQuery = `
@@ -52,13 +61,17 @@ const getDashboardStats = (req, res) => {
                 ORDER BY MONTH(check_in) ASC
             `;
 
+            console.log("[Dashboard Controller] Executing query 3: Monthly statistics...");
             db.query(monthlyStatsQuery, (err, monthlyResults) => {
                 if (err) {
+                    console.error(`[Dashboard Controller] monthlyStatsQuery error: ${err.message}`, err);
                     return res.status(500).json({
                         message: "Gagal mengambil statistik bulanan",
                         error: err.message
                     });
                 }
+
+                console.log(`[Dashboard Controller] Monthly stats query successful, retrieved ${monthlyResults.length} month-grouped results`);
 
                 // Format monthly stats into a 12-month array
                 const monthLabels = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
@@ -71,6 +84,7 @@ const getDashboardStats = (req, res) => {
                     };
                 });
 
+                console.log("[Dashboard Controller] Sending aggregated dashboard response...");
                 res.status(200).json({
                     total_rooms: stats.total_rooms || 0,
                     total_room_types: stats.total_room_types || 0,
