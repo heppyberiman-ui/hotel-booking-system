@@ -1,4 +1,13 @@
 require("dotenv").config();
+
+process.on("uncaughtException", (err) => {
+    console.error("UNCAUGHT EXCEPTION CRASH:", err);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+    console.error("UNHANDLED REJECTION CRASH AT:", promise, "REASON:", reason);
+});
+
 const express = require("express");
 const cors = require("cors");
 const db = require("./config/db");
@@ -56,6 +65,6 @@ app.use("/api/users", userRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server berjalan di port ${PORT}`);
 });

@@ -24,4 +24,8 @@ db.getConnection((err, connection) => {
     }
 });
 
+db.on("error", (err) => {
+    console.error("Unexpected error on idle database client/pool:", err);
+});
+
 module.exports = db;
