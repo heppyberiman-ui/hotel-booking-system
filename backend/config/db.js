@@ -25,6 +25,16 @@ db.getConnection((err, connection) => {
     } else {
         console.log("Database berhasil terhubung");
         connection.release();
+
+        // Auto-initialize database tables if empty
+        const initDatabase = require("./init_db");
+        initDatabase(db)
+            .then(() => {
+                console.log("Database initialization check complete.");
+            })
+            .catch((initErr) => {
+                console.error("Database initialization check failed:", initErr);
+            });
     }
 });
 
