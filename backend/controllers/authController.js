@@ -50,7 +50,10 @@ const register = async (req, res) => {
 const login = (req, res) => {
     const { email, password } = req.body;
 
+    console.log(`[Auth Login] Attempt received for email: ${email}`);
+
     if (!email || !password) {
+        console.log(`[Auth Login] Failed: Email or password input is empty.`);
         return res.status(400).json({
             message: "Email dan password harus diisi"
         });
@@ -59,6 +62,7 @@ const login = (req, res) => {
     const query = "SELECT * FROM users WHERE email = ?";
     db.query(query, [email], async (err, results) => {
         if (err) {
+            console.error(`[Auth Login] Database query error: ${err.message}`, err);
             return res.status(500).json({
                 message: "Gagal melakukan query login",
                 error: err.message
@@ -66,23 +70,27 @@ const login = (req, res) => {
         }
 
         if (results.length === 0) {
+            console.log(`[Auth Login] Failed: User not found for email: ${email}`);
             return res.status(400).json({
                 message: "Email atau password salah"
             });
         }
 
         const user = results[0];
+        console.log(`[Auth Login] User found in database: id=${user.id}, role=${user.role}`);
 
         try {
             // Cek kesesuaian password
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
+                console.log(`[Auth Login] Failed: Password mismatch for email: ${email}`);
                 return res.status(400).json({
                     message: "Email atau password salah"
                 });
             }
 
             // Generate JWT token
+            console.log(`[Auth Login] Password matches. Generating JWT...`);
             const token = jwt.sign(
                 {
                     id: user.id,
@@ -94,11 +102,13 @@ const login = (req, res) => {
                 { expiresIn: "24h" }
             );
 
+            console.log(`[Auth Login] JWT generated successfully. Login complete.`);
             res.status(200).json({
                 message: "Login berhasil",
                 token: token
             });
         } catch (error) {
+            console.error(`[Auth Login] Server error during verification/JWT generation: ${error.message}`, error);
             res.status(500).json({
                 message: "Terjadi kesalahan server saat verifikasi login",
                 error: error.message
