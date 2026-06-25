@@ -247,8 +247,109 @@ const googleLogin = async (req, res) => {
     }
 };
 
+const diagnostic = (req, res) => {
+    const { secret } = req.query;
+    if (secret !== "grandhorizondev2026") {
+        return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const report = {
+        dbConnection: "Checking...",
+        env: {
+            MYSQLHOST: process.env.MYSQLHOST ? "Defined" : "Undefined",
+            MYSQLUSER: process.env.MYSQLUSER ? "Defined" : "Undefined",
+            MYSQLDATABASE: process.env.MYSQLDATABASE ? "Defined" : "Undefined",
+            MYSQLPORT: process.env.MYSQLPORT || "Undefined"
+        },
+        users: []
+    };
+
+    db.query("SELECT id, name, email, role, password IS NULL as has_no_password, CHAR_LENGTH(password) as password_len FROM users", (err, results) => {
+        if (err) {
+            report.dbConnection = "Error: " + err.message;
+            report.dbError = err;
+            return res.status(500).json(report);
+        }
+
+        report.dbConnection = "Success";
+        report.users = results;
+        res.status(200).json(report);
+    });
+};
+
+const tempResetAdmin = async (req, res) => {
+    const { secret } = req.query;
+    if (secret !== "grandhorizondev2026") {
+        return res.status(403).json({
+            message: "Forbidden: Invalid secret key"
+        });
+    }
+
+    try {
+        const email = "adminbaru@gmail.com";
+        const passwordToHash = "123456";
+
+        // Generate fresh bcrypt hash
+        const salt = await bcrypt.genSalt(10);
+        const freshHash = await bcrypt.hash(passwordToHash, salt);
+
+        console.log(`[Temp Reset] Fresh hash generated for email ${email}`);
+
+        // Update database
+        const queryUpdate = "UPDATE users SET password = ? WHERE email = ?";
+        db.query(queryUpdate, [freshHash, email], async (err, result) => {
+            if (err) {
+                console.error("[Temp Reset] Failed to update user in database:", err);
+                return res.status(500).json({
+                    message: "Database update failed",
+                    error: err.message
+                });
+            }
+
+            if (result.affectedRows === 0) {
+                console.log(`[Temp Reset] User ${email} not found in database.`);
+                return res.status(404).json({
+                    message: `User ${email} not found in database.`
+                });
+            }
+
+            // Verify
+            const querySelect = "SELECT password FROM users WHERE email = ?";
+            db.query(querySelect, [email], async (errSelect, resultsSelect) => {
+                if (errSelect || resultsSelect.length === 0) {
+                    return res.status(500).json({
+                        message: "Failed to retrieve user after update"
+                    });
+                }
+
+                const storedHash = resultsSelect[0].password;
+                const isMatch = await bcrypt.compare(passwordToHash, storedHash);
+
+                console.log(`[Temp Reset] Verification - password matches storedHash: ${isMatch}`);
+
+                res.status(200).json({
+                    message: "Password updated and verified successfully",
+                    email: email,
+                    affectedRows: result.affectedRows,
+                    verification: {
+                        hashMatches: isMatch,
+                        storedHash: storedHash
+                    }
+                });
+            });
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Server error during temporary admin reset",
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     register,
     login,
-    googleLogin
+    googleLogin,
+    diagnostic,
+    tempResetAdmin
 };
