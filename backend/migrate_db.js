@@ -1,6 +1,6 @@
 require("dotenv").config();
 const db = require("./config/db");
-const dbName = process.env.MYSQLDATABASE || "grand_horizon_hotel";
+const dbName = process.env.MYSQLDATABASE;
 
 const columnsToAdd = [
   { name: "description", type: "TEXT NULL" },

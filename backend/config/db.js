@@ -1,20 +1,26 @@
 require("dotenv").config();
 const mysql = require("mysql2");
 
-const db = mysql.createConnection({
-    host: process.env.MYSQLHOST || "localhost",
-    user: process.env.MYSQLUSER || "root",
-    password: process.env.MYSQLPASSWORD || "",
-    database: process.env.MYSQLDATABASE || "grand_horizon_hotel",
-    port: process.env.MYSQLPORT ? parseInt(process.env.MYSQLPORT, 10) : 3306
+console.log(`Initializing database pool: connecting to ${process.env.MYSQLHOST}:${process.env.MYSQLPORT || '3306'}...`);
+
+const db = mysql.createPool({
+    host: process.env.MYSQLHOST,
+    user: process.env.MYSQLUSER,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE,
+    port: process.env.MYSQLPORT ? parseInt(process.env.MYSQLPORT, 10) : undefined,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-db.connect((err) => {
+db.getConnection((err, connection) => {
     if (err) {
-        console.log("Database gagal terhubung");
-        console.log(err);
+        console.error("Database gagal terhubung");
+        console.error(err);
     } else {
         console.log("Database berhasil terhubung");
+        connection.release();
     }
 });
 
